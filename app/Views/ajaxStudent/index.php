@@ -32,9 +32,10 @@
 </div>
 </nav>
 
-<!-- Modal (PoP Up Option-->
+<!-- Add Student Modal -->
+<!-- Modal (PoP Up Option-)->
 
-<!-- <?= csrf_token() ?> -->
+ <!-- <?= csrf_token() ?> -->
 <div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModal" aria-hidden="true">
 <div class="modal-dialog">
 <div class="modal-content">
@@ -73,6 +74,101 @@
 </div>
 </div>
 
+<!-- view student Model -->
+<div class="modal fade" id="studentViewModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="studentModalLabel">Student Veiw</h5>
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="model-body">
+  <h4>ID:<span class="id_view"></span></h4>
+  <h4>Name:<span class="name_view"></span></h4>
+  <h4>Email:<span class="email_view"></span></h4>
+  <h4>Phone:<span class="phone_view"></span></h4>
+  <h4>Course:<span class="course_view"></span></h4>
+</div>
+
+<div class="modal-footer">
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+<!-- <button type="button" class="btn btn-primary studentsave">Save</button> -->
+<input type="submit" name="submit" value="Save" class="btn btn-primary studentsave">
+</div>
+</div>
+</div>
+</div>
+
+<!-- Edit Student Model -->
+
+<div class="modal fade" id="studentEditModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="studentEditModal">Edit Student Data</h5>
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+  <input type="hidden" id="stud_id">
+<div class="form-group">
+<Lable>Full Name</lable><span id="error_name" class="text-danger ms-3"></span>
+<input type="text" id="stud_name" class="form-control name" placeholder="Enter Your Full Name">
+</div>
+
+<div class="form-group">
+<Lable>Email</lable>
+<input type="text" id="stud_email" class="form-control email" placeholder="Enter Your Email">
+</div>
+
+<div class="form-group">
+<Lable>Phone</lable>
+<input type="text" id="stud_phone" class="form-control phone" placeholder="Enter Your Phone ">
+</div>
+
+
+<div class="form-group">
+<Lable>Course</lable>
+<input type="text" id="stud_course" class="form-control course" placeholder="Enter Your Course ">
+</div>     
+
+
+<div class="modal-footer">
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+<!-- <button type="button" class="btn btn-primary studentsave">Save</button> -->
+<input type="submit" name="submit" value="Update" class="btn btn-primary studentupdate">
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Delete student Model -->
+<div class="modal fade" id="studentDeleteModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="studentDeleteModal">Student Veiw</h5>
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="model-body">
+  <input type="text" id="stu_delete_id">
+  <h4>Are you want to Delete</h4>
+  
+</div>
+
+<div class="modal-footer">
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+<!-- <button type="button" class="btn btn-primary studentsave">Save</button> -->
+<input type="submit" name="submit" value="Delete" class="btn btn-primary studentdelete">
+</div>
+</div>
+</div>
+</div>
+
+
 
 <div class="container">
 <div class="row">
@@ -89,6 +185,8 @@
 
 </div>
 
+
+<!-- Code to create Table -->
 <div class="card-body">
   <table class="table table-bordered">
     <thead>
@@ -103,6 +201,7 @@
       </tr>
     </thead>
     <tbody class="studentdata">
+
     </tbody>
   </table>
 </div>
@@ -128,23 +227,65 @@
 </body>
 <!-- Java Script Code -->
 
-<!-- Java Script code for Get Request -->
+<!-- Java Script code for Get Request (Retrive Data) (Get Data) -->
 
  <script>
   $(document).ready(function()
     {
+      //function call
       loadstudent();
 
+      //Get Data by using Id
+      //Click Event
+      //This Method for view button
+      $(document).on('click','.view_btn',function()
+    {
+      var stud_id=$(this).closest('tr').find('.stud_id').text();
+      // alert(stud_id);
+
+      // AJAX Query
+       $.ajax({      
+        method:"POST",
+        url:"/student/veiwStudent",
+        data:{
+            'stud_id':stud_id,
+            },
+        success:function(response){
+
+          //It show the data on a console
+          // console.log(response);
+
+          $.each(response, function(key, studview)
+        {
+          $('.id_view').text(studview['id']);
+          $('.name_view').text(studview['name']);
+          $('.email_view').text(studview['email']);
+          $('.phone_view').text(studview['phone']);
+          $('.course_view').text(studview['course']);
+          $('#studentViewModal').modal('show');
+
+        });
+
+        }
+
+      });
+
     });
-     
+
+    });
+
+   
+    //This Function is Used to load Data(Get Data)
   function loadstudent()
     {
+
+      //AJAX Query
       $.ajax({
         method:"GET",
         url:"/student/getdata",
         success: function(response)
         {
-          console.log(response.students);
+          // console.log(response.students);
 
           $.each(response.students , function (key, value){
             // console.log(response.students);
@@ -156,10 +297,11 @@
             <td>'+value['email']+'</td>\
             <td>'+value['phone']+'</td>\
             <td>'+value['course']+'</td>\
+            <td>'+value['created_at']+'</td>\
             <td>\
-            <a href="#" class="badge btn-info viewbtn"> VIEW </a>\
+            <a href="#" class="badge btn-info view_btn"> VIEW </a>\
             <a href="#" class="badge btn-primary edit_btn">EDIT</a>\
-            <a href="#" class="badge btn-danger deletebtn">DELETE</a>\
+            <a href="#" class="badge btn-danger delete_btn">DELETE</a>\
             </td>\
             </tr>'
           );          
@@ -172,10 +314,140 @@
 
   </script>
 
+  <!-- Edit Data method (Update Data)-->
+
+   <script>
+
+    $(document).ready(function(){
+      // loadstudent();
+    
+
+    $(document).on('click','.edit_btn',function()
+    {
+
+      var stud_id=$(this).closest('tr').find('.stud_id').text();
+
+      $.ajax({
+        method:"POST",
+        url:"/student/edit",
+        data:{
+          'stud_id': stud_id,
+        },
+        success: function(response)
+        {
+          // console.log(response);
+
+          $.each(response, function(key , studvalue){
+            $('#stud_id').val(studvalue['id']);
+            $('#stud_name').val(studvalue['name']);
+            $('#stud_email').val(studvalue['email']);
+            $('#stud_phone').val(studvalue['phone']);
+            $('#stud_course').val(studvalue['course']);
+
+            $('#studentEditModal').modal('show');
+
+          });
+
+        }
+
+      });
 
 
 
-<!-- Java Script code For Post Request  -->
+    });
+
+    $(document).on('click','.studentupdate',function(){
+      var data ={
+        'stud_id':$('#stud_id').val(),
+        'name':$('#stud_name').val(),
+        'email':$('#stud_email').val(),
+        'phone':$('#stud_phone').val(),
+        'course':$('#stud_course').val(),
+      };
+
+      $.ajax({
+
+        method:"POST",
+        url:"/student/update",
+        data: data,
+        success: function(response)
+        {
+          $('#studentEditModal').modal('hide');
+          $('.studentdata').html("");
+          loadstudent();
+
+
+          alertify.set('notifier','position','top-right');
+          alertify.success(response.status);
+
+        }
+
+      });
+
+
+
+
+    });
+
+
+
+  });
+
+    </script>
+
+
+<!-- Delete Data Method -->
+
+<script>
+    $(document).ready(function(){
+      $(document).on('click','.delete_btn',function(){
+
+       var stud_id =$(this).closest('tr').find('.stud_id').text();
+          // alert(stud_id);
+
+          $('#stu_delete_id').val(stud_id);
+          $('#studentDeleteModal').modal('show');
+
+      });
+      $(document).on('click','.studentdelete',function(){
+        var stud_id =$('#stu_delete_id').val();
+
+        $.ajax({
+          method:"POST",
+          url:"/student/delete",
+          data:{
+            'stud_id': stud_id
+          },
+          success:function(response)
+          {
+            // $('#studentDeleteModal').modal('hide');
+            // $('.studentdata').html("");
+            //  loadstudent();
+
+
+
+
+            alertify.set('notifier','position','top-right');
+            alertify.success(response.status);
+
+          }
+
+        });
+
+      });
+
+    });
+
+
+
+  </script>
+
+
+
+
+
+
+<!-- Java Script code For Post Request (Save Data in Data Base) -->
 <script>
   $(document).ready(function(){
     $(document).on('click', '.studentsave', function(e){
@@ -208,7 +480,7 @@
       '<?= csrf_token() ?>':'<?=csrf_hash()?>'// Include CSRF Token
       }
 
-
+          // AJAX Query
       $.ajax({
           method:"POST",
           url:"/student/store",
@@ -224,8 +496,8 @@
             $('.studentdata').html('');
             loadstudent();
 
-            // alertify.set('notifier', 'position' , 'top-right');
-            // alertify.success(response.status);
+            alertify.set('notifier', 'position' , 'top-right');
+            alertify.success(response.status);
 
             alert(response.status);
 
@@ -239,8 +511,6 @@
 
   });
 </script>
-
-
 
 
 </html>
